@@ -227,9 +227,7 @@
     (make-reference-object-from-marshal-table table objs)))
 
 (define-method x->marshalized-object ((obj <reference-object>) table)
-  (if (using-same-table? table obj)
-    obj
-    (make-reference-object-from-marshal-table table obj)))
+  obj)
 
 (define-method marshal-object (obj out)
   (write obj out))

@@ -12,39 +12,45 @@
     (setup
      (lambda () (set! table (make-marshal-table))))
     ("can marshalizable? test"
-     (for-each (lambda (obj)
-                 (assert-true (marshalizable? obj)
-                              (format " <~a> must be marshalizable" obj)))
-               (list 1 1.0 'a "a" #t #f :a '() #() #/reg/ (string->regexp "reg")
-                     (list 1 1.0 'a "a" #t #f :a '() #())
-                     (list '(1 1.0) 'a '("a" #(#t #f) :a) '() #())
-                     #(1 1.0 'a "a" #t #f :a '() #())
-                     (list '(1 1.0) 'a '("a" #(#t #f) :a) '() #())
-                     #('(1 1.0) 'a '("a" #(#t #f) :a) '() #())
-                     (list (lambda () #f))
-                     (list 1.0 (lambda () #f) 'a "a")
-                     (list 1.0 (make <reference-object> :ref 100 :table-id 1))
-                     (current-date))))
+     (assert-each (lambda (obj)
+                    (assert-true (marshalizable? obj)
+                                 (format #f " <~a> must be marshalizable" obj)))
+                  (list 1 1.0 'a "a" #t #f :a '() #()
+                        #/reg/ (string->regexp "reg")
+                        (list 1 1.0 'a "a" #t #f :a '() #())
+                        (list '(1 1.0) 'a '("a" #(#t #f) :a) '() #())
+                        #(1 1.0 'a "a" #t #f :a '() #())
+                        (list '(1 1.0) 'a '("a" #(#t #f) :a) '() #())
+                        #('(1 1.0) 'a '("a" #(#t #f) :a) '() #())
+                        (list (lambda () #f))
+                        (list 1.0 (lambda () #f) 'a "a")
+                        (list 1.0
+                              (make <reference-object> :ref 100 :table-id 1))
+                        (current-date))
+                  :apply-if-can #f))
     ("can't marshalizable? test"
-     (for-each (lambda (obj)
-                 (assert-false (marshalizable? obj)
-                               (format " <~a> must be not marshalizable" obj)))
-               (list (lambda () #f)
-                     (make <reference-object> :ref 100 :table-id 1)
-                     )))
+     (assert-each (lambda (obj)
+                    (assert-false (marshalizable? obj)
+                                  (format #f
+                                          " <~a> must be not marshalizable"
+                                          obj)))
+                  (list (lambda () #f)
+                        (make <reference-object> :ref 100 :table-id 1))
+                  :apply-if-can #f))
     ("marshal/unmarshal test"
-     (for-each (lambda (obj)
-                 (assert-equal obj (unmarshal table
-                                              (read-from-string
-                                               (marshal table obj)))))
-               (list 1 'abc "a" '(1) #()
-                     (lambda () #f)
-                     (make-hash-table)
-                     (make <reference-object>
-                       :ref 1
-                       :table-id (with-module marshal (id-of table)))
-                     (list 1 (lambda (x) x) '(1))
-                     (current-date))))
+     (assert-each (lambda (obj)
+                    (assert-equal obj (unmarshal table
+                                                 (read-from-string
+                                                  (marshal table obj)))))
+                  (list 1 'abc "a" '(1) #()
+                        (lambda () #f)
+                        (make-hash-table)
+                        (make <reference-object>
+                          :ref 1
+                          :table-id (with-module marshal (id-of table)))
+                        (list 1 (lambda (x) x) '(1))
+                        (current-date))
+                  :apply-if-can #f))
     ("id-get/id-ref/id-remove!/id-exists? test"
      (assert-each (lambda (obj)
                     (assert-false (id-exists? table obj))
@@ -131,5 +137,4 @@
                      (2 . (1 2 3))
                      (3 . abc)
                      (4 . :key)))
-                  :apply-if-can #f))
-    ))
+                  :apply-if-can #f))))

@@ -5,15 +5,17 @@
   (use util.list)
   (use math.mt-random)
   (use gauche.collection)
-  (export *marshal-version*
-          marshalizable? reference-object? using-same-table?
+  (export *marshal-version* *marshal-false-id*
+
           marshal unmarshal
-          id-get id-put! id-ref id-delete! id-exists?
-          id-fold id-for-each id-map
-          marshal-table->alist alist->marshal-table
+          marshalizable? reference-object? using-same-table?
+          marshal-object unmarshal-object x->marshalized-object
+
           make-marshal-table
-          *marshal-false-id*)
-  )
+          marshal-table->alist alist->marshal-table
+
+          id-get id-put! id-ref id-delete! id-exists?
+          id-fold id-for-each id-map))
 (select-module marshal)
 
 (define *marshal-version* "0.0.2")
@@ -211,33 +213,50 @@
     :ref (id-get table obj)
     :table-id (id-of table)))
 
-(define (marshal table object)
-  (define (make-marshalized-object obj)
-    (if (and (marshalizable? obj)
-             (is-a? obj <collection>))
-        (map-to (class-of obj)
-                make-marshalized-object
-                obj)
-        (if (or (marshalizable? obj)
-                (and (reference-object? obj)
-                     (not (using-same-table? table obj))))
-            obj
-            (make-reference-object-from-marshal-table table obj))))
+(define-method x->marshalized-object (obj table)
+  (if (marshalizable? obj)
+    obj
+    (make-reference-object-from-marshal-table table obj)))
 
+(define-method x->marshalized-object ((objs <collection>) table)
+  (if (marshalizable? objs)
+    (map-to (class-of objs)
+            (lambda (obj)
+              (x->marshalized-object obj table))
+            objs)
+    (make-reference-object-from-marshal-table table obj)))
+
+(define-method x->marshalized-object ((obj <reference-object>) table)
+  (if (using-same-table? table obj)
+    obj
+    (make-reference-object-from-marshal-table table obj)))
+
+(define-method marshal-object (obj out)
+  (write obj out))
+
+(define (marshal table object)
   (let ((out (open-output-string)))
-    (write (make-marshalized-object object) out)
+    (marshal-object (if (marshalizable? object)
+                      (x->marshalized-object object table)
+                      (make-reference-object-from-marshal-table table object))
+                    out)
     (get-output-string out)))
 
-(define (unmarshal table object)
-  (define (rec obj)
-    (if (is-a? obj <collection>)
-        (map-to (class-of obj)
-                rec
-                obj)
-        (if (using-same-table? table obj)
-            (id-ref table (ref-of obj))
-            obj)))
+(define-method unmarshal-object (obj table)
+  obj)
 
-  (rec object))
+(define-method unmarshal-object ((objs <collection>) table)
+  (map-to (class-of objs)
+          (lambda (obj)
+            (unmarshal-object obj table))
+          objs))
+
+(define-method unmarshal-object ((obj <reference-object>) table)
+  (if (using-same-table? table obj)
+    (id-ref table (ref-of obj))
+    obj))
+
+(define (unmarshal table object)
+  (unmarshal-object object table))
 
 (provide "marshal")

@@ -1,13 +1,14 @@
 #!/usr/bin/env gosh
 
-(use test.unit)
-(use msm.marshal)
-(use srfi-19)
+(define-module msm-test
+  (extend msm.marshal)
+  (use test.unit)
+  (use srfi-19))
+(select-module msm-test)
 
 (let ((table #f)
       (sorter (cut sort <> (lambda (x y)
-                             (< (car x) (car y)))))
-      (<reference-object> (with-module msm.marshal <reference-object>)))
+                             (< (car x) (car y))))))
   (define-test-case "Marshal test"
     (setup
      (lambda () (set! table (make-marshal-table))))
@@ -48,14 +49,12 @@
                         (let* ((id 1)
                                (ref (make <reference-object>
                                       :ref id
-                                      :table-id (with-module msm.marshal
-                                                  (id-of table)))))
+                                      :table-id (id-of table))))
                           (id-put! table id ref)
                           ref)
                         (make <reference-object>
                           :ref 10
-                          :table-id (with-module msm.marshal
-                                      (id-of (make-marshal-table))))
+                          :table-id (id-of (make-marshal-table)))
                         (list 1 (lambda (x) x) '(1))
                         (current-date))
                   :apply-if-can #f))

@@ -45,9 +45,17 @@
                   (list 1 'abc "a" '(1) #()
                         (lambda () #f)
                         (make-hash-table)
+                        (let* ((id 1)
+                               (ref (make <reference-object>
+                                      :ref id
+                                      :table-id (with-module marshal
+                                                  (id-of table)))))
+                          (id-put! table id ref)
+                          ref)
                         (make <reference-object>
-                          :ref 1
-                          :table-id (with-module marshal (id-of table)))
+                          :ref 10
+                          :table-id (with-module marshal
+                                      (id-of (make-marshal-table))))
                         (list 1 (lambda (x) x) '(1))
                         (current-date))
                   :apply-if-can #f))

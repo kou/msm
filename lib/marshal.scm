@@ -14,6 +14,7 @@
           make-marshal-table
           marshal-table->alist alist->marshal-table
 
+          ;; should not do export???
           id-get id-put! id-ref id-delete! id-exists?
           id-fold id-for-each id-map))
 (select-module marshal)
@@ -205,8 +206,7 @@
                (date-zone-offset other))))
 
 (define (using-same-table? table object)
-  (and (reference-object? object)
-       (= (id-of table) (table-id-of object))))
+  (= (id-of table) (table-id-of object)))
 
 (define (make-reference-object-from-marshal-table table obj)
   (make <reference-object>
@@ -224,7 +224,7 @@
             (lambda (obj)
               (x->marshalized-object obj table))
             objs)
-    (make-reference-object-from-marshal-table table obj)))
+    (make-reference-object-from-marshal-table table objs)))
 
 (define-method x->marshalized-object ((obj <reference-object>) table)
   (if (using-same-table? table obj)
@@ -236,9 +236,7 @@
 
 (define (marshal table object)
   (let ((out (open-output-string)))
-    (marshal-object (if (marshalizable? object)
-                      (x->marshalized-object object table)
-                      (make-reference-object-from-marshal-table table object))
+    (marshal-object (x->marshalized-object object table)
                     out)
     (get-output-string out)))
 

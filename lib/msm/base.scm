@@ -216,6 +216,11 @@
     obj
     (make-reference-object-from-marshal-table table obj)))
 
+(define-method x->marshalized-object ((obj <string>) table)
+  (if (marshallable? obj)
+    obj
+    (make-reference-object-from-marshal-table table obj)))
+
 (define-method x->marshalized-object ((objs <collection>) table)
   (if (marshallable? objs)
     (map-to (class-of objs)

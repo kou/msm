@@ -5,13 +5,18 @@
   (use math.mt-random)
   (use gauche.collection)
   (export marshalizable? reference-object? using-same-table?
-          marshal unmarshal id-get id-ref id-exists?
-          make-marshal-table)
+          marshal unmarshal
+          id-get id-ref id-delete! id-exists?
+          make-marshal-table
+          *marshal-false-id*)
   )
 (select-module marshal)
 
 (define mt-random (make <mersenne-twister> :seed (sys-time)))
-(define (random) (mt-random-real mt-random))
+(define-method random ()
+  (mt-random-real mt-random))
+(define-method random ((max <integer>))
+  (mt-random-integer mt-random max))
 
 (define-class <reference-object> ()
   ((ref :init-keyword :ref :accessor ref-of)
@@ -46,43 +51,55 @@
        (equal-reference-object? self other)))
 
 (define-class <marshal-table> ()
-  ((id :accessor id-of)
-   (obj->id :accessor obj->id-of)
-   (id->obj :accessor id->obj-of)
-   (counter :accessor counter-of))
+  ((id :accessor id-of :init-form (random))
+   (obj->id :accessor obj->id-of :init-form (make-hash-table 'eq?))
+   (id->obj :accessor id->obj-of :init-form (make-hash-table 'eqv?))
+   (size :accessor size-of :init-value 0))
   )
-
-(define-method initialize ((self <marshal-table>) args)
-  (next-method)
-  (slot-set! self 'id (random))
-  (slot-set! self 'obj->id (make-hash-table 'eq?))
-  (slot-set! self 'id->obj (make-hash-table 'eqv?))
-  (slot-set! self 'counter 0))
 
 (define (make-marshal-table)
   (make <marshal-table>))
 
-(define-method update-counter! ((table <marshal-table>))
-  (inc! (counter-of table)))
+(define (generate-new-id table)
+  (define max (+ 65535 (expt (size-of table) 2)))
+  (define (generate)
+    (+ 1 (random max)))
+  (define (loop)
+    (let ((new-id (generate)))
+      (if (id-exists? table new-id)
+          (loop)
+          new-id)))
+  (loop))
 
-(define false-id 0)
+(define *marshal-false-id* 0)
 
 (define-method id-get ((table <marshal-table>) obj)
   (if (eq? obj #f)
-      false-id
+      *marshal-false-id*
       (or (hash-table-get (obj->id-of table) obj #f)
-          (begin (update-counter! table)
-                 (hash-table-put! (obj->id-of table) obj (counter-of table))
-                 (hash-table-put! (id->obj-of table) (counter-of table) obj)
-                 (counter-of table)))))
+          (let ((new-id (generate-new-id table)))
+            (hash-table-put! (obj->id-of table) obj new-id)
+            (hash-table-put! (id->obj-of table) new-id obj)
+            (inc! (size-of table))
+            new-id))))
 
 (define-method id-ref ((table <marshal-table>) id . fallback)
-  (if (= id false-id)
+  (if (= id *marshal-false-id*)
       #f
       (or (hash-table-get (id->obj-of table) id #f)
           (if (null? fallback)
               (error "no object with id: " id)
               (car fallback)))))
+
+(define-method id-delete! ((table <marshal-table>) id . fallback)
+  (if (id-exists? table id)
+      (let ((obj (id-get table id)))
+        (hash-table-delete! (obj->id-of table) obj)
+        (hash-table-delete! (id->obj-of table) id)
+        #t)
+      (if (null? fallback)
+          (error "no object with id: " id)
+          (car fallback))))
 
 (define-method id-exists? ((table <marshal-table>) id)
   (hash-table-exists? (id->obj-of table) id))

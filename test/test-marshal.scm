@@ -1,20 +1,20 @@
 #!/usr/bin/env gosh
 
 (use test.unit)
-(use marshal)
+(use msm.marshal)
 (use srfi-19)
 
 (let ((table #f)
       (sorter (cut sort <> (lambda (x y)
                              (< (car x) (car y)))))
-      (<reference-object> (with-module marshal <reference-object>)))
+      (<reference-object> (with-module msm.marshal <reference-object>)))
   (define-test-case "Marshal test"
     (setup
      (lambda () (set! table (make-marshal-table))))
-    ("can marshalizable? test"
+    ("can marshallable? test"
      (assert-each (lambda (obj)
-                    (assert-true (marshalizable? obj)
-                                 (format #f " <~a> must be marshalizable" obj)))
+                    (assert-true (marshallable? obj)
+                                 (format #f " <~a> must be marshallable" obj)))
                   (list 1 1.0 'a "a" #t #f :a '() #()
                         #/reg/ (string->regexp "reg")
                         (list 1 1.0 'a "a" #t #f :a '() #())
@@ -28,11 +28,11 @@
                               (make <reference-object> :ref 100 :table-id 1))
                         (current-date))
                   :apply-if-can #f))
-    ("can't marshalizable? test"
+    ("can't marshallable? test"
      (assert-each (lambda (obj)
-                    (assert-false (marshalizable? obj)
+                    (assert-false (marshallable? obj)
                                   (format #f
-                                          " <~a> must be not marshalizable"
+                                          " <~a> must be not marshallable"
                                           obj)))
                   (list (lambda () #f)
                         (make <reference-object> :ref 100 :table-id 1))
@@ -48,13 +48,13 @@
                         (let* ((id 1)
                                (ref (make <reference-object>
                                       :ref id
-                                      :table-id (with-module marshal
+                                      :table-id (with-module msm.marshal
                                                   (id-of table)))))
                           (id-put! table id ref)
                           ref)
                         (make <reference-object>
                           :ref 10
-                          :table-id (with-module marshal
+                          :table-id (with-module msm.marshal
                                       (id-of (make-marshal-table))))
                         (list 1 (lambda (x) x) '(1))
                         (current-date))

@@ -1,4 +1,4 @@
-(define-module marshal
+(define-module msm.base
   (use srfi-1)
   (use srfi-10)
   (use srfi-19)
@@ -8,7 +8,7 @@
   (export *marshal-version* *marshal-false-id*
 
           marshal unmarshal
-          marshalizable? reference-object? using-same-table?
+          marshallable? reference-object? using-same-table?
           marshal-object unmarshal-object x->marshalized-object
 
           make-marshal-table
@@ -17,9 +17,7 @@
           ;; should not do export???
           id-get id-put! id-ref id-delete! id-exists?
           id-fold id-for-each id-map))
-(select-module marshal)
-
-(define *marshal-version* "0.0.2")
+(select-module msm.base)
 
 (define mt-random (make <mersenne-twister> :seed (sys-time)))
 (define-method random ()
@@ -139,37 +137,37 @@
               alist)
     table))
 
-(define-method marshalizable? (obj)
+(define-method marshallable? (obj)
   #f)
 
-(define-method marshalizable? ((obj <number>))
+(define-method marshallable? ((obj <number>))
   #t)
 
-(define-method marshalizable? ((obj <symbol>))
+(define-method marshallable? ((obj <symbol>))
   #t)
 
-(define-method marshalizable? ((obj <char>))
+(define-method marshallable? ((obj <char>))
   #t)
 
-(define-method marshalizable? ((obj <string>))
+(define-method marshallable? ((obj <string>))
   #t)
 
-(define-method marshalizable? ((obj <boolean>))
+(define-method marshallable? ((obj <boolean>))
   #t)
 
-(define-method marshalizable? ((obj <keyword>))
+(define-method marshallable? ((obj <keyword>))
   #t)
 
-(define-method marshalizable? ((lst <list>))
+(define-method marshallable? ((lst <list>))
   #t)
 
-(define-method marshalizable? ((vec <vector>))
+(define-method marshallable? ((vec <vector>))
   #t)
 
-(define-method marshalizable? ((date <regexp>))
+(define-method marshallable? ((date <regexp>))
   #t)
 
-(define-method marshalizable? ((date <date>))
+(define-method marshallable? ((date <date>))
   #t)
 
 (define-reader-ctor '<date>
@@ -214,12 +212,12 @@
     :table-id (id-of table)))
 
 (define-method x->marshalized-object (obj table)
-  (if (marshalizable? obj)
+  (if (marshallable? obj)
     obj
     (make-reference-object-from-marshal-table table obj)))
 
 (define-method x->marshalized-object ((objs <collection>) table)
-  (if (marshalizable? objs)
+  (if (marshallable? objs)
     (map-to (class-of objs)
             (lambda (obj)
               (x->marshalized-object obj table))
@@ -230,7 +228,7 @@
   obj)
 
 (define-method marshal-object (obj out)
-  (write obj out))
+  (write/ss obj out))
 
 (define (marshal table object)
   (let ((out (open-output-string)))
@@ -255,4 +253,4 @@
 (define (unmarshal table object)
   (unmarshal-object object table))
 
-(provide "marshal")
+(provide "msm/base")

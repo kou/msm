@@ -7,13 +7,15 @@
   (export *marshal-version*
           marshalizable? reference-object? using-same-table?
           marshal unmarshal
-          id-get id-ref id-delete! id-exists?
+          id-get id-put! id-ref id-delete! id-exists?
+          id-fold id-for-each id-map
+          marshal-table->alist alist->marshal-table
           make-marshal-table
           *marshal-false-id*)
   )
 (select-module marshal)
 
-(define *marshal-version* "0.0.1")
+(define *marshal-version* "0.0.2")
 
 (define mt-random (make <mersenne-twister> :seed (sys-time)))
 (define-method random ()
@@ -86,6 +88,13 @@
             (inc! (size-of table))
             new-id))))
 
+(define-method id-put! ((table <marshal-table>) id obj)
+  (when (and (not (eq? obj #f))
+             (not (id-exists? table id)))
+    (hash-table-put! (obj->id-of table) obj id)
+    (hash-table-put! (id->obj-of table) id obj)
+    id))
+
 (define-method id-ref ((table <marshal-table>) id . fallback)
   (if (= id *marshal-false-id*)
       #f
@@ -107,8 +116,24 @@
 (define-method id-exists? ((table <marshal-table>) id)
   (hash-table-exists? (id->obj-of table) id))
 
-(define-method ct ((table <marshal-table>)) ;; for debug
+(define-method id-fold ((table <marshal-table>) proc knil)
+  (hash-table-fold (id->obj-of table) proc knil))
+
+(define-method id-for-each ((table <marshal-table>) proc)
+  (hash-table-for-each (id->obj-of table) proc))
+
+(define-method id-map ((table <marshal-table>) proc)
+  (hash-table-map (id->obj-of table) proc))
+
+(define (marshal-table->alist table)
   (hash-table->alist (id->obj-of table)))
+
+(define (alist->marshal-table alist)
+  (let ((table (make-marshal-table)))
+    (for-each (lambda (elem)
+                (id-put! table (car elem) (cdr elem)))
+              alist)
+    table))
 
 (define-method marshalizable? (obj)
   #f)

@@ -43,7 +43,7 @@
                     (assert-equal obj (unmarshal table
                                                  (read-from-string
                                                   (marshal table obj)))))
-                  (list 1 'abc "a" '(1) #()
+                  (list 1 'abc "a" #*"\x00" '(1) #()
                         (lambda () #f)
                         (make-hash-table)
                         (let* ((id 1)

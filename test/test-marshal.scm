@@ -15,7 +15,7 @@
      (for-each (lambda (obj)
                  (assert-true (marshalizable? obj)
                               (format " <~a> must be marshalizable" obj)))
-               (list 1 1.0 'a "a" #t #f :a '() #()
+               (list 1 1.0 'a "a" #t #f :a '() #() #/reg/ (string->regexp "reg")
                      (list 1 1.0 'a "a" #t #f :a '() #())
                      (list '(1 1.0) 'a '("a" #(#t #f) :a) '() #())
                      #(1 1.0 'a "a" #t #f :a '() #())

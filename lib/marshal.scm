@@ -163,6 +163,9 @@
 (define-method marshalizable? ((vec <vector>))
   #t)
 
+(define-method marshalizable? ((date <regexp>))
+  #t)
+
 (define-method marshalizable? ((date <date>))
   #t)
 

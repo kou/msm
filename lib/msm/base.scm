@@ -217,9 +217,7 @@
     (make-reference-object-from-marshal-table table obj)))
 
 (define-method x->marshalized-object ((obj <string>) table)
-  (if (marshallable? obj)
-    obj
-    (make-reference-object-from-marshal-table table obj)))
+  obj)
 
 (define-method x->marshalized-object ((objs <collection>) table)
   (if (marshallable? objs)
@@ -242,6 +240,9 @@
     (get-output-string out)))
 
 (define-method unmarshal-object (obj table)
+  obj)
+
+(define-method unmarshal-object ((obj <string>) table)
   obj)
 
 (define-method unmarshal-object ((objs <collection>) table)

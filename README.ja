@@ -4,24 +4,34 @@
 
 $Id$
 
-== $B:n<T(B
+== ºî¼Ô
 
 Kouhei Sutou <kou@cozmixng.org>
 
-== $B%i%$%;%s%9(B
+== ¥é¥¤¥»¥ó¥¹
 
 GPL or BSD License
 
-== $B%a!<%j%s%0%j%9%H(B
+== ¥á¡¼¥ê¥ó¥°¥ê¥¹¥È
 
-((<COZMIXNG RWiki - $BO"Mm@h(B|URL:http://www.cozmixng.org/~rwiki/index.rb?cmd=view;name=%CF%A2%CD%ED%C0%E8>))$B$r8fMw2<$5$$!%(B
+((<COZMIXNG RWiki - Ï¢ÍíÀè|URL:http://www.cozmixng.org/~rwiki/index.rb?cmd=view;name=%CF%A2%CD%ED%C0%E8>))¤ò¸æÍ÷²¼¤µ¤¤¡¥
 
-== $B$J$K$3$l!)(B
+== ¤Ê¤Ë¤³¤ì¡©
 
-$B4J0W(Bmarshal/unmarshal$B%i%$%V%i%j$G$9!%(B
+´Ê°×marshal/unmarshal¥é¥¤¥Ö¥é¥ê¤Ç¤¹¡¥
 
-$BJ8;zNs$d?tCM$J$I(Bread/write$B$G$-$k%*%V%8%'%/%H$O$=$N$^$^(B
-read/write$B$r;H$C$F(Bmarshal/unmarshal$B$7$^$9$,!$<jB3$-$J$I(B
-read/write$B$G$-$J$$%*%V%8%'%/%H$O(BID$B$r$D$1$F%a%b%j>e$G4IM}$7$^(B
-$B$9!%$D$^$j!$F1$8%W%m%;%9Fb$G$O(Bmarshal/unmarshal$B$G$-$^$9$,!$(B
-$B%W%m%;%9$r1[$($F(Bmarshal/unmarshal$B$O$G$-$^$;$s!%(B
+Ê¸»úÎó¤ä¿ôÃÍ¤Ê¤Éread/write¤Ç¤­¤ë¥ª¥Ö¥¸¥§¥¯¥È¤Ï¤½¤Î¤Þ¤Þ
+read/write¤ò»È¤Ã¤Æmarshal/unmarshal¤·¤Þ¤¹¤¬¡¤¼êÂ³¤­¤Ê¤É
+read/write¤Ç¤­¤Ê¤¤¥ª¥Ö¥¸¥§¥¯¥È¤ÏID¤ò¤Ä¤±¤Æ¥á¥â¥ê¾å¤Ç´ÉÍý¤·¤Þ
+¤¹¡¥¤Ä¤Þ¤ê¡¤Æ±¤¸¥×¥í¥»¥¹Æâ¤Ç¤Ïmarshal/unmarshal¤Ç¤­¤Þ¤¹¤¬¡¤
+¥×¥í¥»¥¹¤ò±Û¤¨¤Æmarshal/unmarshal¤Ï¤Ç¤­¤Þ¤»¤ó¡¥
+
+== Æþ¼êÊýË¡
+
+((<URL:http://www.cozmixng.org/~kou/download/scratch.tar.gz>))
+
+  % svn co http://www.cozmixng.org/repos/gauche/scratch/trunk scratch
+
+== ¥¤¥ó¥¹¥È¡¼¥ë
+
+  # gosh install/install.scm

@@ -4,13 +4,16 @@
   (use util.list)
   (use math.mt-random)
   (use gauche.collection)
-  (export marshalizable? reference-object? using-same-table?
+  (export *marshal-version*
+          marshalizable? reference-object? using-same-table?
           marshal unmarshal
           id-get id-ref id-delete! id-exists?
           make-marshal-table
           *marshal-false-id*)
   )
 (select-module marshal)
+
+(define *marshal-version* "0.0.1")
 
 (define mt-random (make <mersenne-twister> :seed (sys-time)))
 (define-method random ()

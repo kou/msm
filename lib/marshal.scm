@@ -1,6 +1,7 @@
 (define-module marshal
   (use srfi-1)
   (use srfi-10)
+  (use srfi-19)
   (use util.list)
   (use math.mt-random)
   (use gauche.collection)
@@ -161,6 +162,42 @@
 
 (define-method marshalizable? ((vec <vector>))
   #t)
+
+(define-method marshalizable? ((date <date>))
+  #t)
+
+(define-reader-ctor '<date>
+  (lambda args
+    (apply make-date args)))
+
+(define-method write-object ((self <date>) out)
+  (format out "#,(<date> ~s ~s ~s ~s ~s ~s ~s ~s)"
+          (date-nanosecond self)
+          (date-second self)
+          (date-minute self)
+          (date-hour self)
+          (date-day self)
+          (date-month self)
+          (date-year self)
+          (date-zone-offset self)))
+
+(define-method object-equal? ((self <date>) (other <date>))
+  (and (equal? (date-nanosecond self)
+               (date-nanosecond other))
+       (equal? (date-second self)
+               (date-second other))
+       (equal? (date-minute self)
+               (date-minute other))
+       (equal? (date-hour self)
+               (date-hour other))
+       (equal? (date-day self)
+               (date-day other))
+       (equal? (date-month self)
+               (date-month other))
+       (equal? (date-year self)
+               (date-year other))
+       (equal? (date-zone-offset self)
+               (date-zone-offset other))))
 
 (define (using-same-table? table object)
   (and (reference-object? object)

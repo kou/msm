@@ -2,6 +2,7 @@
 
 (use test.unit)
 (use marshal)
+(use srfi-19)
 
 (let ((table #f)
       (sorter (cut sort <> (lambda (x y)
@@ -23,7 +24,7 @@
                      (list (lambda () #f))
                      (list 1.0 (lambda () #f) 'a "a")
                      (list 1.0 (make <reference-object> :ref 100 :table-id 1))
-                     )))
+                     (current-date))))
     ("can't marshalizable? test"
      (for-each (lambda (obj)
                  (assert-false (marshalizable? obj)
@@ -42,7 +43,8 @@
                      (make <reference-object>
                        :ref 1
                        :table-id (with-module marshal (id-of table)))
-                     (list 1 (lambda (x) x) '(1)))))
+                     (list 1 (lambda (x) x) '(1))
+                     (current-date))))
     ("id-get/id-ref/id-remove!/id-exists? test"
      (assert-each (lambda (obj)
                     (assert-false (id-exists? table obj))

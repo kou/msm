@@ -28,9 +28,9 @@ read/writeできないオブジェクトはIDをつけてメモリ上で管理しま
 
 == 入手方法
 
-((<URL:http://www.cozmixng.org/~kou/download/scratch.tar.gz>))
+((<URL:http://www.cozmixng.org/~kou/download/marshal.tar.gz>))
 
-  % svn co http://www.cozmixng.org/repos/gauche/scratch/trunk scratch
+  % svn co http://www.cozmixng.org/repos/gauche/marshal/trunk marshal
 
 == インストール
 

@@ -5,7 +5,7 @@
   (use math.mt-random)
   (use gauche.collection)
   (export marshalizable? reference-object? using-same-table?
-          marshal unmarshal id-get id-ref
+          marshal unmarshal id-get id-ref id-exists?
           make-marshal-table)
   )
 (select-module marshal)
@@ -83,6 +83,9 @@
           (if (null? fallback)
               (error "no object with id: " id)
               (car fallback)))))
+
+(define-method id-exists? ((table <marshal-table>) id)
+  (hash-table-exists? (id->obj-of table) id))
 
 (define-method ct ((table <marshal-table>)) ;; for debug
   (hash-table->alist (id->obj-of table)))

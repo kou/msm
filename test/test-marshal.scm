@@ -38,4 +38,15 @@
                          :ref 1
                          :table-id (id-of table)))
                      (list 1 (lambda (x) x) '(1)))))
+    ("id-get/id-ref/id-exists? test"
+     (assert-each (lambda (obj)
+                    (assert-false (id-exists? table obj))
+                    (let ((id (id-get table obj)))
+                      (assert-equal obj (id-ref table id))
+                      (assert-true (id-exists? table id))))
+                  (list 1 1.0 'a "a"
+                        (list 1 '#(1 'a "a") 3)
+                        (lambda () #f))
+                  :apply-if-can #f))
+    
     ))

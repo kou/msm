@@ -56,7 +56,10 @@
                           :ref 10
                           :table-id (id-of (make-marshal-table)))
                         (list 1 (lambda (x) x) '(1))
-                        (current-date))
+                        (current-date)
+                        '(symbol :keyword #f)
+                        '(symbol :keyword . #f)
+                        '(#f :keyword . symbol))
                   :apply-if-can #f))
     ("id-get/id-ref/id-remove!/id-exists? test"
      (assert-each (lambda (obj)

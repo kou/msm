@@ -219,6 +219,27 @@
 (define-method x->marshalized-object ((obj <string>) table)
   obj)
 
+(define-method x->marshalized-object ((obj <null>) table)
+  obj)
+
+(define-method x->marshalized-object ((objs <list>) table)
+  (if (marshallable? objs)
+    (if (null? (cdr (last-pair objs)))
+      (map (lambda (obj)
+              (x->marshalized-object obj table))
+           objs)
+      (let loop ((result '())
+                 (objs objs))
+        (cond ((null? objs) (reverse! result))
+              ((not (pair? objs))
+               (append! (reverse! result)
+                        (x->marshalized-object objs table)))
+              (else
+               (loop (cons (x->marshalized-object (car objs) table)
+                           result)
+                     (cdr objs))))))
+    (make-reference-object-from-marshal-table table objs)))
+
 (define-method x->marshalized-object ((objs <collection>) table)
   (if (marshallable? objs)
     (map-to (class-of objs)
@@ -244,6 +265,25 @@
 
 (define-method unmarshal-object ((obj <string>) table)
   obj)
+
+(define-method unmarshal-object ((objs <null>) table)
+  objs)
+
+(define-method unmarshal-object ((objs <list>) table)
+  (if (null? (cdr (last-pair objs)))
+    (map (lambda (obj)
+           (unmarshal-object obj table))
+         objs)
+    (let loop ((result '())
+               (objs objs))
+      (cond ((null? objs) (reverse! result))
+            ((not (pair? objs))
+             (append! (reverse! result)
+                      (unmarshal-object objs table)))
+            (else
+             (loop (cons (unmarshal-object (car objs) table)
+                         result)
+                   (cdr objs)))))))
 
 (define-method unmarshal-object ((objs <collection>) table)
   (map-to (class-of objs)
